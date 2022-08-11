@@ -24,4 +24,4 @@ An eaxmple shows here:
 
 More examples and details see:
 
-> **https://junjunlab.github.io/jjAnno-manual/**
+> **https://junjunlab.github.io/jjPlot-manual/**
