@@ -45,10 +45,10 @@ StatJjboxplot <- ggplot2::ggproto("StatJjboxplot", ggplot2::Stat,
                                     out <- out %>% dplyr::mutate(iqr = upper - lower) %>%
                                       dplyr::mutate(ymin = ifelse(lower - iqr*1.5 <= ymin,
                                                                   ymin,
-                                                                  data$y[order(data$y)][2]),
+                                                                  lower - iqr*1.5),
                                                     ymax = ifelse(upper + iqr*1.5 >= ymax,
                                                                   ymax,
-                                                                  rev(data$y[order(data$y)])[2]))
+                                                                  upper + iqr*1.5))
 
                                     # filter outliers
                                     outlier <- data$y > out$upper + out$iqr*1.5 | data$y < out$lower - out$iqr*1.5
