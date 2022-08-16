@@ -43,7 +43,8 @@ geom_jjpie <- function(mapping = NULL, data = NULL,
                        hollow.fill = 'white',
                        na.rm = FALSE,
                        show.legend = TRUE,
-                       inherit.aes = TRUE) {
+                       inherit.aes = TRUE,
+                       shift = NULL) {
   ggplot2::layer(
     data = data,
     mapping = mapping,
@@ -66,6 +67,7 @@ geom_jjpie <- function(mapping = NULL, data = NULL,
       rect.fill = rect.fill,
       circle.radius = circle.radius,
       hollow.fill = hollow.fill,
+      shift = shift,
       ...
     )
   )
@@ -98,7 +100,8 @@ GeomJjpie <- ggproto("GeomJjpie", ggplot2::Geom,
                                            rect.col = 'black',
                                            rect.fill = 'white',
                                            circle.radius = 0,
-                                           hollow.fill = 'white') {
+                                           hollow.fill = 'white',
+                                           shift = NULL) {
 
                        # pie.dat returned
                        # refer to corrplot package: https://github.com/taiyun/corrplot/blob/master/R/corrplot.R
@@ -186,14 +189,25 @@ GeomJjpie <- ggproto("GeomJjpie", ggplot2::Geom,
                        # calculate ratio
                        ratio <- sum(panel_scales$y.range)/sum(panel_scales$x.range)
 
+                       # ajust pie radius
+                       if(is.null(shift)){
+                         if(ratio > 1){
+                           pie.shift = 0.5 + 1/ratio
+                         }else{
+                           pie.shift = 0.5 + ratio
+                         }
+                       }else{
+                         pie.shift = shift
+                       }
+
                        # ratio type
                        if(ratio > 1){
                          pie_x = coords_new$x + coords_new$pielist[[1]][["x"]]*ratio
-                         pie_y = coords_new$y + coords_new$pielist[[1]][["y"]]*(0.5 + 1/ratio)
+                         pie_y = coords_new$y + coords_new$pielist[[1]][["y"]]*pie.shift
 
                          ratio <- ratio
                        }else if(ratio < 1){
-                         pie_x = coords_new$x + coords_new$pielist[[1]][["x"]]*(0.5 + ratio)
+                         pie_x = coords_new$x + coords_new$pielist[[1]][["x"]]*pie.shift
                          pie_y = coords_new$y + coords_new$pielist[[1]][["y"]]*(1/ratio)
 
                          ratio <- 1/ratio
