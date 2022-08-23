@@ -14,6 +14,10 @@ You can install the development version of jjAnno like so:
 devtools::install_github("junjunlab/jjPlot")
 ```
 
+## Citation
+
+> Jun Z (2022). *jjPlot: Some Geom/Stat Functions to Produce Funny Graphs.*  https://github.com/junjunlab/jjPlot, https://junjunlab.github.io/jjPlot-manual/
+
 ## Example
 
 An eaxmple shows here:
