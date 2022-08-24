@@ -24,8 +24,7 @@ geom_jjpie(
   hollow.fill = "white",
   na.rm = FALSE,
   show.legend = TRUE,
-  inherit.aes = TRUE,
-  shift = NULL
+  inherit.aes = TRUE
 )
 }
 \arguments{

@@ -43,8 +43,7 @@ geom_jjpie <- function(mapping = NULL, data = NULL,
                        hollow.fill = 'white',
                        na.rm = FALSE,
                        show.legend = TRUE,
-                       inherit.aes = TRUE,
-                       shift = NULL) {
+                       inherit.aes = TRUE) {
   ggplot2::layer(
     data = data,
     mapping = mapping,
@@ -67,7 +66,6 @@ geom_jjpie <- function(mapping = NULL, data = NULL,
       rect.fill = rect.fill,
       circle.radius = circle.radius,
       hollow.fill = hollow.fill,
-      shift = shift,
       ...
     )
   )
@@ -100,8 +98,7 @@ GeomJjpie <- ggplot2::ggproto("GeomJjpie", ggplot2::Geom,
                                                     rect.col = 'black',
                                                     rect.fill = 'white',
                                                     circle.radius = 0,
-                                                    hollow.fill = 'white',
-                                                    shift = NULL) {
+                                                    hollow.fill = 'white') {
 
                                 # pie.dat returned
                                 # refer to corrplot package: https://github.com/taiyun/corrplot/blob/master/R/corrplot.R
@@ -143,36 +140,38 @@ GeomJjpie <- ggplot2::ggproto("GeomJjpie", ggplot2::Geom,
                                                                    rect.width = scales::rescale(rect.width,from = panel_scales$x.range),
                                                                    rect.height = scales::rescale(rect.height,from = panel_scales$y.range))
 
-                                # rescale pie pos
-                                map_df(1:nrow(coords),function(x){
-                                  tmp <- coords[x,]
+                                # # rescale pie pos
+                                # map_df(1:nrow(coords),function(x){
+                                #   tmp <- coords[x,]
+                                #
+                                #   # calculate each group pie coordinates
+                                #   if(tmp$theta <= 90){
+                                #     tmp$pielist[[1]]["x"] <- scales::rescale(tmp$pielist[[1]][["x"]],
+                                #                                              to = c(0,sin((tmp$theta/180)*pi)*tmp$width/2))
+                                #     tmp$pielist[[1]]["y"] <- scales::rescale(tmp$pielist[[1]][["y"]],
+                                #                                              to = c(0,tmp$width/2))
+                                #   }else if(tmp$theta <= 180 & tmp$theta > 90){
+                                #     tmp$pielist[[1]]["x"] <- scales::rescale(tmp$pielist[[1]][["x"]],
+                                #                                              to = c(0,tmp$width/2))
+                                #     tmp$pielist[[1]]["y"] <- scales::rescale(tmp$pielist[[1]][["y"]],
+                                #                                              to = c(cos((tmp$theta/180)*pi)*tmp$width/2,tmp$width/2))
+                                #   }else if(tmp$theta <= 270 & tmp$theta > 180){
+                                #     tmp$pielist[[1]]["x"] <- scales::rescale(tmp$pielist[[1]][["x"]],
+                                #                                              to = c(sin((tmp$theta/180)*pi)*tmp$width/2,tmp$width/2))
+                                #     tmp$pielist[[1]]["y"] <- scales::rescale(tmp$pielist[[1]][["y"]],
+                                #                                              to = c(-tmp$width/2,tmp$width/2))
+                                #   }else{
+                                #     # 270-360 degree
+                                #     tmp$pielist[[1]]["x"] <- scales::rescale(tmp$pielist[[1]][["x"]],
+                                #                                              to = c(-tmp$width/2,tmp$width/2))
+                                #     tmp$pielist[[1]]["y"] <- scales::rescale(tmp$pielist[[1]][["y"]],
+                                #                                              to = c(-tmp$width/2,tmp$width/2))
+                                #   }
+                                #
+                                #   return(tmp)
+                                # }) -> coords_new
 
-                                  # calculate each group pie coordinates
-                                  if(tmp$theta <= 90){
-                                    tmp$pielist[[1]]["x"] <- scales::rescale(tmp$pielist[[1]][["x"]],
-                                                                             to = c(0,sin((tmp$theta/180)*pi)*tmp$width/2))
-                                    tmp$pielist[[1]]["y"] <- scales::rescale(tmp$pielist[[1]][["y"]],
-                                                                             to = c(0,tmp$width/2))
-                                  }else if(tmp$theta <= 180 & tmp$theta > 90){
-                                    tmp$pielist[[1]]["x"] <- scales::rescale(tmp$pielist[[1]][["x"]],
-                                                                             to = c(0,tmp$width/2))
-                                    tmp$pielist[[1]]["y"] <- scales::rescale(tmp$pielist[[1]][["y"]],
-                                                                             to = c(cos((tmp$theta/180)*pi)*tmp$width/2,tmp$width/2))
-                                  }else if(tmp$theta <= 270 & tmp$theta > 180){
-                                    tmp$pielist[[1]]["x"] <- scales::rescale(tmp$pielist[[1]][["x"]],
-                                                                             to = c(sin((tmp$theta/180)*pi)*tmp$width/2,tmp$width/2))
-                                    tmp$pielist[[1]]["y"] <- scales::rescale(tmp$pielist[[1]][["y"]],
-                                                                             to = c(-tmp$width/2,tmp$width/2))
-                                  }else{
-                                    # 270-360 degree
-                                    tmp$pielist[[1]]["x"] <- scales::rescale(tmp$pielist[[1]][["x"]],
-                                                                             to = c(-tmp$width/2,tmp$width/2))
-                                    tmp$pielist[[1]]["y"] <- scales::rescale(tmp$pielist[[1]][["y"]],
-                                                                             to = c(-tmp$width/2,tmp$width/2))
-                                  }
-
-                                  return(tmp)
-                                }) -> coords_new
+                                coords_new <- coords
 
                                 # Construct a grid grob
                                 rect <- grid::rectGrob(x = coords_new$x,
@@ -186,49 +185,60 @@ GeomJjpie <- ggplot2::ggproto("GeomJjpie", ggplot2::Geom,
                                                                        lwd = coords_new$size * .pt,
                                                                        lty = coords_new$linetype))
 
-                                # calculate ratio
-                                ratio <- sum(panel_scales$y.range)/sum(panel_scales$x.range)
+                                # # calculate ratio
+                                # ratio <- sum(panel_scales$y.range)/sum(panel_scales$x.range)
+                                #
+                                # # ajust pie radius
+                                # if(is.null(shift)){
+                                #   if(ratio > 1){
+                                #     pie.shift = 0.5 + 1/ratio
+                                #   }else{
+                                #     pie.shift = 0.5 + ratio
+                                #   }
+                                # }else{
+                                #   pie.shift = shift
+                                # }
+                                #
+                                # # ratio type
+                                # if(ratio > 1){
+                                #   pie_x = coords_new$x + coords_new$pielist[[1]][["x"]]*ratio
+                                #   pie_y = coords_new$y + coords_new$pielist[[1]][["y"]]*pie.shift
+                                #
+                                #   ratio <- ratio
+                                # }else if(ratio < 1){
+                                #   pie_x = coords_new$x + coords_new$pielist[[1]][["x"]]*pie.shift
+                                #   pie_y = coords_new$y + coords_new$pielist[[1]][["y"]]*(1/ratio)
+                                #
+                                #   ratio <- 1/ratio
+                                # }else{
+                                #   pie_x = coords_new$x + coords_new$pielist[[1]][["x"]]
+                                #   pie_y = coords_new$y + coords_new$pielist[[1]][["y"]]
+                                #
+                                #   ratio <- 1/ratio
+                                # }
 
-                                # ajust pie radius
-                                if(is.null(shift)){
-                                  if(ratio > 1){
-                                    pie.shift = 0.5 + 1/ratio
-                                  }else{
-                                    pie.shift = 0.5 + ratio
-                                  }
-                                }else{
-                                  pie.shift = shift
-                                }
-
-                                # ratio type
-                                if(ratio > 1){
-                                  pie_x = coords_new$x + coords_new$pielist[[1]][["x"]]*ratio
-                                  pie_y = coords_new$y + coords_new$pielist[[1]][["y"]]*pie.shift
-
-                                  ratio <- ratio
-                                }else if(ratio < 1){
-                                  pie_x = coords_new$x + coords_new$pielist[[1]][["x"]]*pie.shift
-                                  pie_y = coords_new$y + coords_new$pielist[[1]][["y"]]*(1/ratio)
-
-                                  ratio <- 1/ratio
-                                }else{
-                                  pie_x = coords_new$x + coords_new$pielist[[1]][["x"]]
-                                  pie_y = coords_new$y + coords_new$pielist[[1]][["y"]]
-
-                                  ratio <- 1/ratio
-                                }
+                                # pie viewport
+                                vp <- grid::viewport(x = coords_new$x,
+                                                     y = coords_new$y,
+                                                     width = grid::unit(coords_new$width,"snpc"),
+                                                     height = grid::unit(coords_new$width,"snpc"),
+                                                     # angle = coords_new$angle,
+                                                     just = c("center", "center"),
+                                                     default.units = "native")
 
                                 # circle grob
                                 circle <- grid::circleGrob(x = coords_new$x,
                                                            y = coords_new$y,
-                                                           r = coords_new$width/2*ratio,
+                                                           r = coords_new$width/2,
                                                            gp = grid::gpar(col = circle.colour,
                                                                            fill = circle.fill,
                                                                            lwd = coords_new$size * .pt))
 
                                 # pie grob  + coords_new$width/2
-                                pie <- grid::polygonGrob(x = pie_x,
-                                                         y = pie_y,
+                                pie <- grid::polygonGrob(x = coords_new$pielist[[1]][["x"]] + 0.5,
+                                                         y = coords_new$pielist[[1]][["y"]] + 0.5,
+                                                         vp = vp,
+                                                         name = coords_new$group,
                                                          gp = grid::gpar(col = ggplot2::alpha(coords_new$colour,coords_new$alpha),
                                                                          fill= ggplot2::alpha(coords_new$fill,coords_new$alpha),
                                                                          lty = coords_new$linetype,

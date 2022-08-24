@@ -153,41 +153,41 @@ GeomJjpie2 <- ggplot2::ggproto("GeomJjpie2", ggplot2::Geom,
                                  # calculate ratio
                                  ratio <- (sum(panel_scales$y.range) - 1)/(sum(panel_scales$x.range) - 1)
 
-                                 # ajust pie radius
-                                 if(is.null(shift)){
-                                   if(ratio > 1){
-                                     pie.shift = ratio
-                                   }else{
-                                     pie.shift = 1/ratio
-                                   }
-                                 }else{
-                                   pie.shift = shift*10
-                                 }
-
-                                 # pie x width and height
-                                 if(ratio > 1){
-                                   vp_width = coords$width*pie.shift
-                                   vp_height = coords$width
-
-                                   cirle_width = coords$width/2*pie.shift
-                                 }else if(ratio < 1){
-                                   vp_width = coords$width
-                                   vp_height = coords$width*pie.shift
-
-                                   cirle_width = coords$width/2*pie.shift
-                                 }else{
-                                   vp_width = coords$width
-                                   vp_height = coords$width
-
-                                   cirle_width = coords$width/2
-                                 }
+                                 # # ajust pie radius
+                                 # if(is.null(shift)){
+                                 #   if(ratio > 1){
+                                 #     pie.shift = ratio
+                                 #   }else{
+                                 #     pie.shift = 1/ratio
+                                 #   }
+                                 # }else{
+                                 #   pie.shift = shift*10
+                                 # }
+                                 #
+                                 # # pie x width and height
+                                 # if(ratio > 1){
+                                 #   vp_width = coords$width*pie.shift
+                                 #   vp_height = coords$width
+                                 #
+                                 #   cirle_width = coords$width/2*pie.shift
+                                 # }else if(ratio < 1){
+                                 #   vp_width = coords$width
+                                 #   vp_height = coords$width*pie.shift
+                                 #
+                                 #   cirle_width = coords$width/2*pie.shift
+                                 # }else{
+                                 #   vp_width = coords$width
+                                 #   vp_height = coords$width
+                                 #
+                                 #   cirle_width = coords$width/2
+                                 # }
 
 
                                  # produce grobs
                                  vp <- grid::viewport(x = coords$x,
                                                       y = coords$y,
-                                                      width = vp_width,
-                                                      height = vp_height,
+                                                      width = grid::unit(coords$width,"snpc"),
+                                                      height = grid::unit(coords$width,"snpc"),
                                                       angle = coords$angle,
                                                       just = c("center", "center"),
                                                       default.units = "native")
@@ -207,7 +207,7 @@ GeomJjpie2 <- ggplot2::ggproto("GeomJjpie2", ggplot2::Geom,
                                  # circle grob
                                  circle <- grid::circleGrob(x = coords$x,
                                                             y = coords$y,
-                                                            r = cirle_width,
+                                                            r = coords$width/2,
                                                             gp = grid::gpar(col = circle.colour,
                                                                             fill = circle.fill,
                                                                             lwd = coords$size * .pt))
